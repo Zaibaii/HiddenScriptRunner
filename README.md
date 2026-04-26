@@ -22,6 +22,8 @@ hsr [-silent] [-wait] <script_or_exe> [arguments]
 hsr [-help]
 ```
 
+> Note: If installed via the provided scripts, you can simply use the `hsr` alias.
+
 ### Command Line Arguments
 Arguments must be placed before the target to be interpreted by HSR.
 
@@ -30,8 +32,6 @@ Arguments must be placed before the target to be interpreted by HSR.
 | -help, /help | -h, /h, /? | Displays the usage help message box and returns the exit code 0. |
 | -silent, /silent | -s, /s | Suppresses all HSR message boxes (errors or help). |
 | -wait, /wait | -w, /w | Waits for the target to finish and returns its exit code. |
-
-> Note: If installed via the provided scripts, you can simply use the `hsr` alias from any terminal.
 
 ### Exit Codes
 HSR uses specific exit codes to distinguish between its own operational errors and the target script's results:
