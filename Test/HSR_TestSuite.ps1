@@ -32,7 +32,7 @@ Function Set-Up {
 	$sCMDContent = '@echo ARG=[%~1^|%~2^|%~3]>> "' + $sLogFile + '"'
 	$sCMDPathContent = '@echo ARG=[PATH_SUCCESS]>> "' + $sLogFile + '"'
 	$sCMDWDContent = '@echo ARG=[WORKDIR_SUCCESS]>> "' + $sLogFile + '"'
-	$sFAKEEXEContent = '"This is a fake executable to test code 3: Launch error'
+	$sFAKEEXEContent = '"This is a fake executable to test code 103: Launch error'
 	
 	Set-Content -Path "$PSScriptRoot\HSR_Test.ps1" -Value $sPSContent
 	Set-Content -Path "$PSScriptRoot\HSR Test Space.ps1" -Value $sPSContent
@@ -102,16 +102,21 @@ $aMatrixTest = @(
 )
 
 # MATRIX - Exit codes
-# Exit codes: 0=Success, 1=Missing target, 2=Target not found, 3=Launch error (simulated via invalid interpreter)
+# Exit codes: 0=Success, 101=Missing target, 102=Target not found, 103=Launch error (simulated via invalid interpreter)
 $aMatrixExitCode = @(
 	@{ Name = "Exit code 0 (Success)"; Cmd = "{EXE} -silent `"{ROOT}\HSR_Test.ps1`""; ExpectedCode = 0 }
-	@{ Name = "Exit code 1 (Missing target)"; Cmd = "{EXE} -silent"; ExpectedCode = 1 }
-	@{ Name = "Exit code 2 (Not Found)"; Cmd = "{EXE} -silent `"NonExistent.ps1`""; ExpectedCode = 2 }
-	@{ Name = "Exit code 3 (Launch Error)"; Cmd = "{EXE} -silent `"{ROOT}\HSR_Test_Code3.exe`""; ExpectedCode = 3 }
+	@{ Name = "Exit code 101 (Missing target)"; Cmd = "{EXE} -silent"; ExpectedCode = 101 }
+	@{ Name = "Exit code 102 (Not Found)"; Cmd = "{EXE} -silent `"NonExistent.ps1`""; ExpectedCode = 102 }
+	@{ Name = "Exit code 103 (Launch Error)"; Cmd = "{EXE} -silent `"{ROOT}\HSR_Test_Code3.exe`""; ExpectedCode = 103 }
+	@{ Name = "Flag -help (Return 0)"; Cmd = "{EXE} -help -silent"; ExpectedCode = 0 }
+    @{ Name = "Flag /? (Return 0)"; Cmd = "{EXE} /? -silent"; ExpectedCode = 0 }
+    @{ Name = "Flag -wait & CMD Exit Code (42)"; Cmd = "{EXE} -wait -silent cmd.exe /c `"exit 42`""; ExpectedCode = 42 }
+    @{ Name = "Flag -w & PS Exit Code (13)"; Cmd = "{EXE} -w -silent powershell.exe -Command `"exit 13`""; ExpectedCode = 13 }
 )
 
 # Runs the tests
 Write-Host "`n--- HSR Test Suite ---" -ForegroundColor White
+$iPadRight = 35
 foreach ($sFileExe in $aBinarie) {
 	$sFullPath = Join-Path $sReleaseDir $sFileExe
 	if (-not (Test-Path $sFullPath)) {
@@ -133,7 +138,7 @@ foreach ($sFileExe in $aBinarie) {
 		}
 		
 		if (Test-Path $sLogFile) { Remove-Item $sLogFile -Force -ErrorAction SilentlyContinue }
-		$sTitleTest = $hMatrix.Name.PadRight(30)
+		$sTitleTest = $hMatrix.Name.PadRight($iPadRight)
 		Write-Host "Testing: $sTitleTest " -NoNewline
 		$sCommand = $hMatrix.Cmd.Replace("{EXE}", "`"$sFullPath`"").Replace("{ROOT}", $PSScriptRoot).Replace("{LOG}", $sLogFile)
 		
@@ -172,10 +177,10 @@ foreach ($sFileExe in $aBinarie) {
 		}
 	}
 
-	# Tests - Exit codes & Silent Mode
+	# Tests - Exit codes & HSR flags
 	Write-Host "`n[EXIT CODES]" -ForegroundColor Cyan
 	foreach ($hMatrix in $aMatrixExitCode) {
-		$sTitleTest = $hMatrix.Name.PadRight(30)
+		$sTitleTest = $hMatrix.Name.PadRight($iPadRight)
 		Write-Host "Testing: $sTitleTest " -NoNewline
 		$sCommand = $hMatrix.Cmd.Replace("{EXE}", "`"$sFullPath`"").Replace("{ROOT}", $PSScriptRoot)
 		

@@ -1,6 +1,6 @@
 <#
 HiddenScriptRunner (HSR): A universal script runner that hides the console window
-3_Optional_HSR_Install_Admin.ps1: Installs binaries and update the system PATH
+3_Optional_HSR_Install_Admin.ps1: Installs binaries and update the System PATH
 #>
 
 $sOriginalTitle = $Host.UI.RawUI.WindowTitle
@@ -65,7 +65,7 @@ try {
 	Write-Host "`nFailed to copy files: $($_.Exception.Message)" -ForegroundColor Red
 }
 
-# Adds HSR to the system PATH
+# Adds HSR to the System PATH
 $regKey = $null
 try {
 	$sRegistryPath = "System\CurrentControlSet\Control\Session Manager\Environment"
@@ -89,7 +89,7 @@ try {
 	}
 } catch {
 	$bError = $true
-	Write-Host "`nFailed to update system PATH: $($_.Exception.Message)" -ForegroundColor Red
+	Write-Host "`nFailed to update System PATH: $($_.Exception.Message)" -ForegroundColor Red
 } finally {
 	if ($null -ne $regKey) { $regKey.Close() }
 }

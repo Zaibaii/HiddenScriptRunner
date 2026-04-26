@@ -32,13 +32,14 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 // These attributes populate the "Details" tab of the file properties
-[assembly: AssemblyProduct("HiddenScriptRunner")]
-[assembly: AssemblyTitle("A universal script runner that hides the console window")]
-[assembly: AssemblyDescription("A universal script runner that hides the console window")]
+[assembly: AssemblyTitle("HiddenScriptRunner (HSR)")]
+[assembly: AssemblyProduct("HiddenScriptRunner (HSR)")]
 [assembly: AssemblyCompany("Zaibai Software Production")]
 [assembly: AssemblyCopyright("Copyright \u00A9 2020-2030 Zaibai Software Production")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyDescription("A universal script runner that hides the console window. GitHub: https://github.com/Zaibaii/HiddenScriptRunner")]
+[assembly: AssemblyInformationalVersion("1.0.0 | A universal script runner that hides the console window. GitHub: https://github.com/Zaibaii/HiddenScriptRunner")]
+[assembly: AssemblyVersion("1.0.0")]
+[assembly: AssemblyFileVersion("1.0.0")]
 
 public class NoWindowHostOfHSR {
 	
@@ -46,12 +47,12 @@ public class NoWindowHostOfHSR {
 	[DllImport("kernel32.dll", CharSet = CharSet.Auto)]
 	private static extern IntPtr GetCommandLine();
 	
-	// Helper to check if an executable exists in the system PATH
+	// Helper to check if an executable exists in the System PATH
 	private static bool IsBinaryAvailable(string binaryName) {
 		return FindInPath(binaryName) != null;
 	}
 	
-	// Logic to resolve a file name to a full path via the system PATH
+	// Logic to resolve a file name to a full path via the System PATH
 	private static string FindInPath(string fileName) {
 		
 		// Get standard executable extensions (.EXE, .BAT, etc.)
@@ -95,25 +96,76 @@ public class NoWindowHostOfHSR {
 		// Recovery of the system command line (raw)
 		string rawCmd = Marshal.PtrToStringAuto(GetCommandLine());
 		
-		// Detection of the -silent flag: does not display error message boxes
-		bool silent = args.Any(a => a.Equals("-silent", StringComparison.OrdinalIgnoreCase));
-		var cleanArgs = args.Where(a => !a.Equals("-silent", StringComparison.OrdinalIgnoreCase)).ToArray();
+		// Detection of the HSR flags only if it appears BEFORE the target:
+		// -help: Displays the usage help message box and returns the exit code 0
+		// -silent: Does not display message boxes
+		// -wait: Waits for the process to finish and returns its exit code
+		bool help = false;
+		bool silent = false;
+		bool wait = false;
+		int flagOffset = 0;
 		
-		// Missing target - Help message box
-		if (cleanArgs.Length < 1) {
+		// Flexible flag detection (supports "--", "-", "/" and short versions)
+		for (int i = 0; i < args.Length; i++) {
+			switch (args[i].ToLower()) {
+				// silent flag
+				case "--silent":
+				case "-silent":
+				case "/silent":
+				case "-s":
+				case "/s":
+					silent = true;
+					flagOffset++;
+					break;
+				
+				// wait flag
+				case "--wait":
+				case "-wait":
+				case "/wait":
+				case "-w":
+				case "/w":
+					wait = true;
+					flagOffset++;
+					break;
+				
+				// help flag
+				case "--help":
+				case "-help":
+				case "/help":
+				case "-h":
+				case "-?":
+				case "/h":
+				case "/?":
+					help = true;
+					flagOffset++;
+					break;
+				default:
+					i = args.Length; // Stop parsing flags. Treats the following argument as the target.
+					break;
+			}
+		}
+		
+		// cleanArgs starts after the HSR flags if present
+		var cleanArgs = args.Skip(flagOffset).ToArray();
+		
+		// Show help if requested OR if no target is provided
+		if (help || cleanArgs.Length < 1) {
 			if (!silent) {
-				MessageBox.Show("HiddenScriptRunner (HSR)\n" +
+				string currentVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion;
+				MessageBox.Show("HiddenScriptRunner (HSR) - v" + currentVersion + "\n" +
 								"A universal script runner that hides the console window.\n\n" +
+								"GitHub: https://github.com/Zaibaii/HiddenScriptRunner\n\n" +
 								"Usage:\n" +
-								"HiddenScriptRunner.exe [-silent] \"<script_path>\" \"[arguments]\"\n\n" +
+								"HiddenScriptRunner.exe [-silent] [-wait] \"<script_or_exe>\" \"[arguments]\"\n\n" +
 								"Example:\n" +
 								"1. Basic: HiddenScriptRunner.exe \"C:\\Script\\test.ps1\"\n" +
 								"2. Arguments: HiddenScriptRunner.exe \"C:\\Script\\test.bat\" \"arg1\" \"arg2\"\n" +
-								"3. Advanced: HiddenScriptRunner.exe -silent \"powershell.exe\" -NoProfile -ExecutionPolicy Bypass -File \"C:\\Script\\test.ps1\" \"C:\\My Argument 1\\\\\"\n\n" +
-								"Exit codes: 0=Success, 1=Missing target, 2=Target not found, 3=Launch error",
+								"3. Advanced: HiddenScriptRunner.exe -silent -wait \"powershell.exe\" -NoProfile -ExecutionPolicy Bypass -File \"C:\\Script\\test.ps1\" \"C:\\My Argument 1\\\\\"\n\n" +
+								"Exit codes: 0=Success, 101=Missing target, 102=Target not found, 103=Launch error\n" +
+								"(Note: With -wait, HSR returns the exit code of the target process).",
 								"How to use it?", MessageBoxButtons.OK, MessageBoxIcon.Information);
 			}
-			return 1;
+			return help ? 0 : 101;
 		}
 		
 		// Searchs the target
@@ -129,7 +181,7 @@ public class NoWindowHostOfHSR {
 				MessageBox.Show(string.Format("The following target/file cannot be found:\n{0}", target), 
 								"Target not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
-			return 2;
+			return 102;
 		}
 
 		// Process start and file information
@@ -248,7 +300,11 @@ public class NoWindowHostOfHSR {
 		// Runs the hidden process
 		//MessageBox.Show("DEBUG:\nFileName: " + startInfo.FileName + "\nArgs: " + startInfo.Arguments);
 		try {
-			Process.Start(startInfo);
+			Process p = Process.Start(startInfo);
+			if (wait && p != null) {
+				p.WaitForExit();
+				return p.ExitCode;
+			}
 			return 0;
 		} catch (Exception ex) {
 			if (!silent) {
@@ -256,7 +312,7 @@ public class NoWindowHostOfHSR {
 								Path.GetFileName(startInfo.FileName), ex.Message), 
 								"Error starting process", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
-			return 3;
+			return 103;
 		}
 	}
 }

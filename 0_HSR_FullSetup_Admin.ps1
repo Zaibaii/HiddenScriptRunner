@@ -80,10 +80,10 @@ Write-Host "`n--- HiddenScriptRunner Installation ---" -ForegroundColor Yellow
 Write-Host '0_HSR_FullSetup_Admin.ps1: Main script that runs "all" the scripts:'
 Write-Host "	- 1_HSR_Compile.ps1: Compiles C# source code into binaries."
 Write-Host "	- 2_Optional_HSR_CodeSign_Admin.ps1: Creates/Installs digital certificate and sign binaries."
-Write-Host "	- 3_Optional_HSR_Install_Admin.ps1: Installs binaries and update the system PATH."
+Write-Host "	- 3_Optional_HSR_Install_Admin.ps1: Installs binaries and update the System PATH."
 
 # Safety confirmation to avoid accidental execution
-$sConfirm = Read-Host "`nDo you confirm that you want to install HiddenScriptRunner and add it to the system PATH? (y/N)"
+$sConfirm = Read-Host "`nDo you confirm that you want to install HiddenScriptRunner and add it to the System PATH? (y/N)"
 if ($sConfirm.Trim() -ne "y") {
 	Write-Host "`nInstallation cancelled." -ForegroundColor Yellow
 	_Exit 0 $true
@@ -106,7 +106,7 @@ if ($iLEC -ne 0) {
 $null =_RunStep $sSignScript "[Step 2/3]" "Applying the digital signature..."
 
 # Step 3: Installation (NON-CRITICAL)
-$null =_RunStep $sInstallScript "[Step 3/3]" "Installing binaries and updating the system PATH..."
+$null =_RunStep $sInstallScript "[Step 3/3]" "Installing binaries and updating the System PATH..."
 
 # Displays the result
 if ($iGlobalError -eq 0) {

@@ -1,6 +1,6 @@
 <#
 HiddenScriptRunner (HSR): A universal script runner that hides the console window
-Uninstall_HSR_Admin.ps1: Uninstalls HSR and remove it from the system PATH
+Uninstall_HSR_Admin.ps1: Uninstalls HSR and remove it from the System PATH
 #>
 
 $sOriginalTitle = $Host.UI.RawUI.WindowTitle
@@ -31,7 +31,7 @@ $Host.UI.RawUI.WindowTitle = "HiddenScriptRunner - Uninstall (Administrator)"
 
 # Safety confirmation to avoid accidental execution
 Write-Host "`n--- HiddenScriptRunner Uninstallation ---" -ForegroundColor Yellow
-$sConfirm = Read-Host "Are you sure you want to uninstall HiddenScriptRunner and remove it from system PATH? (y/N)"
+$sConfirm = Read-Host "Are you sure you want to uninstall HiddenScriptRunner and remove it from System PATH? (y/N)"
 if ($sConfirm.Trim() -ne "y") {
 	Write-Host "`nUninstallation cancelled." -ForegroundColor Yellow
 	_Exit 0 $true
@@ -52,7 +52,7 @@ if ($oRunning) {
 	Start-Sleep -Milliseconds 400
 }
 
-# Removes HSR from the system PATH
+# Removes HSR from the System PATH
 $sInstallDir = Join-Path $env:ProgramFiles "HiddenScriptRunner"
 $bError = $false
 $regKey = $null
@@ -81,7 +81,7 @@ try {
 	}
 } catch {
 	$bError = $true
-	Write-Host "`nFailed to clean system PATH: $($_.Exception.Message)" -ForegroundColor Red
+	Write-Host "`nFailed to clean System PATH: $($_.Exception.Message)" -ForegroundColor Red
 } finally {
 	if ($null -ne $regKey) { $regKey.Close() }
 }
