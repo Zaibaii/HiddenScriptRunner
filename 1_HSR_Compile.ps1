@@ -340,7 +340,7 @@ if (-not $sCSCFile) {
 $sUTF8Encoding = if ($PSVersionTable.PSVersion.Major -ge 6) { "UTF8BOM" } else { "UTF8" }
 $sSourceFile = Join-Path $env:TEMP "HSR_source.cs"
 $sReleaseDir = New-Item -Path (Join-Path $PSScriptRoot "Release") -ItemType Directory -Force
-$sIconFile = Join-Path $PSScriptRoot "Data\Image\Icon.ico"
+$sIconFile = Join-Path $PSScriptRoot "Data\Picture\Icon.ico"
 $sCodeCSharp | Out-File -FilePath $sSourceFile -Encoding $sUTF8Encoding -Force
 $aTempFile = @($sSourceFile)
 
