@@ -36,7 +36,7 @@ $cert = Get-ChildItem Cert:\LocalMachine\My, Cert:\LocalMachine\Root, Cert:\Loca
 		Select-Object -First 1
 if (-not $cert) {
 	try {
-		$cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=Zaibai Software Production" `
+		$cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=Zaibai" `
 				-TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3") `
 				-KeyUsage DigitalSignature -FriendlyName $sCertName `
 				-NotAfter (Get-Date).AddYears(10) `
