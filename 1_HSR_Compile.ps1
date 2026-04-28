@@ -34,8 +34,8 @@ using System.Text.RegularExpressions;
 // These attributes populate the "Details" tab of the file properties
 [assembly: AssemblyTitle("HiddenScriptRunner (HSR)")]
 [assembly: AssemblyProduct("HiddenScriptRunner (HSR)")]
-[assembly: AssemblyCompany("Zaibai Software Production")]
-[assembly: AssemblyCopyright("Copyright \u00A9 2020-2030 Zaibai Software Production")]
+[assembly: AssemblyCompany("Zaibai")]
+[assembly: AssemblyCopyright("Copyright \u00A9 2026 Zaibai <erwan-91310@hotmail.fr> (https://github.com/Zaibaii)")]
 [assembly: AssemblyDescription("A universal script runner that hides the console window. GitHub: https://github.com/Zaibaii/HiddenScriptRunner")]
 [assembly: AssemblyInformationalVersion("1.0.0 | A universal script runner that hides the console window. GitHub: https://github.com/Zaibaii/HiddenScriptRunner")]
 [assembly: AssemblyVersion("1.0.0")]
